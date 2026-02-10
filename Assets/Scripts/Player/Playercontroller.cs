@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class Playercontroller : MonoBehaviour
@@ -11,6 +12,8 @@ public class Playercontroller : MonoBehaviour
 
     public bool isGrounded;
     public Animator animator;
+    public bool OnJump;
+    public bool OnFall;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,6 +25,15 @@ public class Playercontroller : MonoBehaviour
 
     // Update is called once per frame
     void FixedUpdate()
+    {
+        movement();
+        jump();
+
+
+
+    }
+
+    private void movement()
     {
         // Horizontal Movement
         rigid.linearVelocityX = InputController.MoveData * moveSpeed * Time.deltaTime;//deltaTime is used to avoid jitter.
@@ -40,7 +52,10 @@ public class Playercontroller : MonoBehaviour
         {
             animator.SetInteger("Movement", 0);
         }
+    }
 
+    private void jump()
+    {
         // Jump Logic
         if (InputController.Isjumping && isGrounded)
         {
@@ -49,6 +64,17 @@ public class Playercontroller : MonoBehaviour
 
             // To allow only jumping once per land, we reset the input flag
             InputController.Isjumping = false;
+
+            animator.SetBool("jump", true);
+            OnJump = true;
+
+        }
+        if (rigid.linearVelocityY < 0 && !isGrounded)
+        {
+            OnFall = true;
+            animator.SetBool("fall", true);
+            animator.SetBool("jump", false);
+            
         }
 
     }
@@ -58,6 +84,8 @@ public class Playercontroller : MonoBehaviour
         if (collision.gameObject.tag == "Ground")
         {
             isGrounded = true;
+            animator.SetBool("fall", false);
+            animator.SetBool("jump", false);
         }
     }
 
